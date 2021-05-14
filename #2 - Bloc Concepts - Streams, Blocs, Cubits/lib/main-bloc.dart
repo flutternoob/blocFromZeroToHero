@@ -1,40 +1,48 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 
-enum CounterEvent { increment, decrement }
+//Creating an increment and decrement enum
+enum CounterEvent{increment, decrement}
 
 class CounterBloc extends Bloc<CounterEvent, int> {
-  CounterBloc() : super(0);
+  CounterBloc(): super(0);
 
   @override
   Stream<int> mapEventToState(CounterEvent event) async* {
-    switch (event) {
-      case CounterEvent.increment:
-        yield state + 1;
-        break;
-      case CounterEvent.decrement:
-        yield state - 1;
-        break;
+    try {
+      switch (event) {
+        case CounterEvent.increment:
+          yield state + 1;
+          break;
+        case CounterEvent.decrement:
+          yield state - 1;
+          break;
+      }
+    } catch (error) {
+      throw UnimplementedError();
     }
-    throw UnimplementedError();
   }
 }
 
 Future<void> main(List<String> args) async {
-  final bloc = CounterBloc();
+  final CounterBloc counterBloc = CounterBloc();
 
-  final streamSubscription = bloc.listen(print);
+  //Subscribe to the bloc state stream and print the state values emitted by it
+  //Use stream.listen, .listen is deprecated
+  final StreamSubscription streamSubscription = counterBloc.stream.listen(print);
 
-  bloc.add(CounterEvent.increment);
-  bloc.add(CounterEvent.increment);
-  bloc.add(CounterEvent.increment);
+  counterBloc.add(CounterEvent.increment);
+  counterBloc.add(CounterEvent.increment);
+  counterBloc.add(CounterEvent.increment);
 
-  bloc.add(CounterEvent.decrement);
-  bloc.add(CounterEvent.decrement);
-  bloc.add(CounterEvent.decrement);
+  counterBloc.add(CounterEvent.decrement);
+  counterBloc.add(CounterEvent.decrement);
+  counterBloc.add(CounterEvent.decrement);
 
-  await Future.delayed(Duration
-      .zero); //! we use this to not cancel the subscription immediately down here
+  //Used to avoid cancelling the stream subscription immediately
+  await Future.delayed(Duration.zero);
 
   await streamSubscription.cancel();
-  await bloc.close();
+
+  await counterBloc.close();
 }

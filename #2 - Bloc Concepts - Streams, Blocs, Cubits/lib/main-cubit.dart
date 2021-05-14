@@ -1,26 +1,48 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 
-class CounterCubit extends Cubit<int> {
-  CounterCubit() : super(0);
+//Creating an increment and decrement enum
+enum CounterEvent{increment, decrement}
 
-  void increment() => emit(state + 1);
-  void decrement() => emit(state - 1);
+class CounterBloc extends Bloc<CounterEvent, int> {
+  CounterBloc(): super(0);
+
+  @override
+  Stream<int> mapEventToState(CounterEvent event) async* {
+    try {
+      switch (event) {
+        case CounterEvent.increment:
+          yield state + 1;
+          break;
+        case CounterEvent.decrement:
+          yield state - 1;
+          break;
+      }
+    } catch (error) {
+      throw UnimplementedError();
+    }
+  }
 }
 
 Future<void> main(List<String> args) async {
-  final cubit = CounterCubit();
+  final CounterBloc counterBloc = CounterBloc();
 
-  final streamSubscription = cubit.listen(
-      print); //! this subscribes to the cubit state stream and prints the state values emitted by it
+  //Subscribe to the bloc state stream and print the state values emitted by it
+  //Use stream.listen, .listen is deprecated
+  final StreamSubscription streamSubscription = counterBloc.stream.listen(print);
 
-  cubit.increment();
-  cubit.increment();
-  cubit.increment();
-  cubit.increment();
+  counterBloc.add(CounterEvent.increment);
+  counterBloc.add(CounterEvent.increment);
+  counterBloc.add(CounterEvent.increment);
 
-  await Future.delayed(Duration
-      .zero); //! we use this to not cancel the subscription immediately down here
+  counterBloc.add(CounterEvent.decrement);
+  counterBloc.add(CounterEvent.decrement);
+  counterBloc.add(CounterEvent.decrement);
+
+  //Used to avoid cancelling the stream subscription immediately
+  await Future.delayed(Duration.zero);
 
   await streamSubscription.cancel();
-  await cubit.close();
+
+  await counterBloc.close();
 }

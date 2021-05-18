@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-///Used a stateless widget since state is handled by the Block library in this case. I referred the
+///Used a stateless widget since state is handled by the Bloc library in this case. I referred the
 ///following link: https://stackoverflow.com/questions/58864869/flutter-state-management-bloc-stateless-vs-stateful-widget
 class MyHomePage extends StatelessWidget {
   final String? title;

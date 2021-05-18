@@ -43,7 +43,7 @@ class MyHomePage extends StatelessWidget {
             Text("You have pushed this button this many times:"),
             BlocConsumer<CounterCubit, CounterState>(
               ///Refactored the if...else block into a function to show the SnackBar Widget
-                listener: (context, state) => snackBarFunction(state.wasIncremented, context),
+                listener: (context, state) => snackBarFunction(state.wasIncremented!, context),
                 ///Refactored the if...else block into a function that returns a Text widget
                 builder: (context, state) => counterText(state.counterValue!, context)),
             SizedBox(height: 24),
@@ -73,7 +73,7 @@ class MyHomePage extends StatelessWidget {
 
 ///This function is used to show the snack bar widget depending on whether the counter was incremented
 ///or decremented
-void snackBarFunction(bool? counterState, context) {
+void snackBarFunction(bool counterState, context) {
   if (counterState == true) {
     ///Scaffold.of(context).showSnackBar(snackBar) is deprecated
     ///Using ScaffoldMessenger.of(context).showSnackBar(snackBar) instead
@@ -90,8 +90,8 @@ void snackBarFunction(bool? counterState, context) {
 }
 
 ///This function is used to change the returned Text widget in accordance with the value of the counter
-Text counterText(int? counterValue, context) {
-  if (counterValue! < 0) {
+Text counterText(int counterValue, context) {
+  if (counterValue < 0) {
     return Text("BRR, Negative $counterValue",
         style: Theme.of(context).textTheme.headline4);
   } else if (counterValue % 2 == 0) {

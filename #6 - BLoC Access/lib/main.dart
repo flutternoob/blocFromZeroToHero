@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_concepts/logic/cubit/counter_cubit.dart';
-import 'package:flutter_bloc_concepts/presentation/router/app_router.dart';
+import 'package:flutter_counter_bloc/logic/cubits/counter_cubit.dart';
+import 'package:flutter_counter_bloc/presentation/router/app_router.dart';
 
-void main() {
-  runApp(MyApp());
+void main() => runApp(MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
 }
 
-class MyApp extends StatelessWidget {
+class _MyAppState extends State<MyApp> {
   final AppRouter _appRouter = AppRouter();
 
   @override
+  void dispose() {
+    _appRouter.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterCubit>(
+    return BlocProvider(
       create: (context) => CounterCubit(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: "Flutter Demo",
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        onGenerateRoute: _appRouter.onGenerateRoute,
+        onGenerateRoute: _appRouter.onGeneratedRoute,
       ),
     );
   }

@@ -14,7 +14,7 @@ void snackBarFunction(bool counterState, BuildContext context) {
   }
 }
 
-Text counterText(int counterValue, context) {
+Text counterText(int counterValue, BuildContext context) {
   if (counterValue < 0) {
     return Text("BRR, Negative $counterValue",
         style: Theme.of(context).textTheme.headline4);

@@ -1,47 +1,47 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_counter_bloc/logic/cubits/counter_cubit.dart';
+import 'package:flutter_counter_bloc/logic/cubits/internet_cubit.dart';
+import 'package:flutter_counter_bloc/presentation/router/app_router.dart';
 
-import 'package:flutter_bloc_concepts/logic/cubit/counter_cubit.dart';
-import 'package:flutter_bloc_concepts/presentation/router/app_router.dart';
+void main() => runApp(MyApp(appRouter: AppRouter(), connectivity: Connectivity(),));
 
-import 'logic/cubit/internet_cubit.dart';
+class MyApp extends StatefulWidget {
+  final AppRouter appRouter;
+  final Connectivity? connectivity;
 
-void main() {
-  runApp(MyApp(
-    appRouter: AppRouter(),
-    connectivity: Connectivity(),
-  ));
+  MyApp({Key? key, required this.appRouter, required this.connectivity}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
 }
 
-class MyApp extends StatelessWidget {
-  final AppRouter appRouter;
-  final Connectivity connectivity;
+class _MyAppState extends State<MyApp> {
 
-  const MyApp({
-    Key key,
-    @required this.appRouter,
-    @required this.connectivity,
-  }) : super(key: key);
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<InternetCubit>(
-          create: (context) => InternetCubit(connectivity: connectivity),
+          create: (context) => InternetCubit(connectivity: widget.connectivity),
         ),
         BlocProvider<CounterCubit>(
-          create: (context) => CounterCubit(),
-        ),
+          create: (context) => CounterCubit(internetCubit: BlocProvider.of<InternetCubit>(context)),
+        )
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: "Flutter Demo",
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        onGenerateRoute: appRouter.onGenerateRoute,
+        onGenerateRoute: widget.appRouter.onGeneratedRoute,
       ),
     );
   }

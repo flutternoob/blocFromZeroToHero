@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_concepts/logic/cubit/counter_cubit.dart';
+import 'package:flutter_counter_bloc/logic/cubits/internet_cubit.dart';
+import 'package:flutter_counter_bloc/constants/enums.dart';
+import 'package:flutter_counter_bloc/logic/cubits/counter_cubit.dart';
+import 'package:flutter_counter_bloc/logic/functions/counter_functions.dart';
 
 class ThirdScreen extends StatefulWidget {
-  ThirdScreen({Key key, this.title, this.color}) : super(key: key);
+  final String? title;
+  final Color? color;
 
-  final String title;
-  final Color color;
+  const ThirdScreen({Key? key, this.title, this.color}) : super(key: key);
 
   @override
   _ThirdScreenState createState() => _ThirdScreenState();
@@ -17,107 +20,50 @@ class _ThirdScreenState extends State<ThirdScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: widget.color,
-        title: Text(widget.title),
+        title: Text(widget.title!),
+        backgroundColor: widget.color!,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+          children: [
+            BlocBuilder<InternetCubit, InternetState>(
+                builder: (context, state) {
+                  if (state is InternetConnected && state.connectionType == ConnectionType.Wifi){
+                    return Text("Wifi");
+                  }
+                  else if (state is InternetConnected && state.connectionType == ConnectionType.Mobile){
+                    return Text("Mobile");
+                  }
+                  else if (state is InternetDisconnected) {
+                    return Text("Disconnected");
+                  }
+                  return CircularProgressIndicator();
+                }
             ),
             BlocConsumer<CounterCubit, CounterState>(
-              listener: (context, state) {
-                if (state.wasIncremented == true) {
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Incremented!'),
-                      duration: Duration(milliseconds: 300),
-                    ),
-                  );
-                } else if (state.wasIncremented == false) {
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Decremented!'),
-                      duration: Duration(milliseconds: 300),
-                    ),
-                  );
-                }
-              },
-              builder: (context, state) {
-                if (state.counterValue < 0) {
-                  return Text(
-                    'BRR, NEGATIVE ' + state.counterValue.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                } else if (state.counterValue % 2 == 0) {
-                  return Text(
-                    'YAAAY ' + state.counterValue.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                } else if (state.counterValue == 5) {
-                  return Text(
-                    'HMM, NUMBER 5',
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-                } else
-                  return Text(
-                    state.counterValue.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  );
-              },
-            ),
-            SizedBox(
-              height: 24,
-            ),
+                listener: (context, state) => snackBarFunction(state.wasIncremented!, context),
+                builder: (context, state) => counterText(state.counterValue!, context)),
+            SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton(
-                  heroTag: Text('${widget.title}'),
+                  onPressed: () => BlocProvider.of<CounterCubit>(context).decrement(),
                   backgroundColor: widget.color,
-                  onPressed: () {
-                    BlocProvider.of<CounterCubit>(context).decrement();
-                    // context.bloc<CounterCubit>().decrement();
-                  },
-                  tooltip: 'Decrement',
+                  heroTag: Text("${widget.title!}"),
+                  tooltip: "Decrement",
                   child: Icon(Icons.remove),
                 ),
                 FloatingActionButton(
+                  onPressed: () => BlocProvider.of<CounterCubit>(context).increment(),
                   backgroundColor: widget.color,
-                  heroTag: Text('${widget.title} 2nd'),
-                  onPressed: () {
-                    // BlocProvider.of<CounterCubit>(context).increment();
-                    context.bloc<CounterCubit>().increment();
-                  },
-                  tooltip: 'Increment',
+                  heroTag: Text("${widget.title!} #2"),
+                  tooltip: "Increment",
                   child: Icon(Icons.add),
                 ),
               ],
             ),
-            SizedBox(
-              height: 24,
-            ),
-            // MaterialButton(
-            //   color: widget.color,
-            //   child: Text(
-            //     'Go to Second Screen',
-            //     style: TextStyle(color: Colors.white),
-            //   ),
-            //   onPressed: () {
-            //     Navigator.of(context).push(
-            //       MaterialPageRoute<HomeScreen>(
-            //         builder: (context) {
-            //           return HomeScreen(
-            //             color: Colors.redAccent,
-            //             title: 'Second Screen',
-            //           );
-            //         },
-            //       ),
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),
